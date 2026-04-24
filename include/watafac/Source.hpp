@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WATAFAC_SOURCE_HPP
+#define WATAFAC_SOURCE_HPP
 #include <string>
 #include <memory>
 #include <optional>
@@ -19,3 +20,4 @@ namespace wfac {
         std::optional<std::string> content_;
     };
 }
+#endif
