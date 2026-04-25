@@ -7,6 +7,9 @@
 namespace wfac {
     class Source {
     public:
+        struct Location{
+            std::size_t start, end;
+        };
         virtual std::unique_ptr<std::istream> get_istream() = 0;
         virtual ~Source() = default;
     };

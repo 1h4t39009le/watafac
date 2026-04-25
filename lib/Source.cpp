@@ -19,7 +19,7 @@ namespace wfac {
         if(content_){
             return std::make_unique<std::istringstream>(*content_);
         }
-        auto stream = std::make_unique<std::ifstream>(filepath_);
+        auto stream = std::make_unique<std::ifstream>(filepath_, std::ios::binary);
         if (!stream->is_open()) {
             return nullptr;
         }

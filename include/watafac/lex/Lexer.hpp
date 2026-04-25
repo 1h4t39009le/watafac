@@ -9,11 +9,14 @@ namespace wfac::lex {
     public:
         explicit Lexer(std::shared_ptr<wfac::Source> source);
         Token next_token();
+        std::string get_lexeme(Source::Location loc);
     private:
         int get_char();
         void unget_char();
         void pin_token();
         Token save_token(Token::Kind kind);
+        std::string get_lexeme();
+        
         
         std::shared_ptr<wfac::Source> source_;
         std::unique_ptr<std::istream> stream_;

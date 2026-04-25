@@ -34,4 +34,6 @@ endmacro()
 
 add_subdirectory(lib)
 add_subdirectory(lib/lex)
+add_subdirectory(lib/ast)
+add_subdirectory(lib/parse)
 add_subdirectory(tools/wfac)

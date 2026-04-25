@@ -14,10 +14,54 @@ namespace wfac::lex {
                 return save_token(TKind::Eof);
             case '+':
                 return save_token(TKind::Plus);
+            case '-':
+                return save_token(TKind::Minus);
             case '*':
                 return save_token(TKind::Star);
+            case '/':
+                return save_token(TKind::Slash);
+            case '%':
+                return save_token(TKind::Percent);
+            case '!':
+                if(get_char() == '='){
+                    return save_token(TKind::NotEquals);
+                }
+                unget_char();
+                return save_token(TKind::Bang);
+            case '<':
+                if(get_char() == '='){
+                    return save_token(TKind::LessOrEq);
+                }
+                unget_char();
+                return  save_token(TKind::Less);
+            case '>':
+                if(get_char() == '='){
+                    return save_token(TKind::GreaterOrEq);
+                }
+                unget_char();
+                return  save_token(TKind::Greater);
+            case '&':
+                if(get_char() == '&'){
+                    return save_token(TKind::AmpersandAmp);
+                }
+                unget_char();
+                return  save_token(TKind::Ampersand);
+            case '|':
+                if(get_char() == '|'){
+                    return save_token(TKind::PipePip);
+                }
+                unget_char();
+                return  save_token(TKind::Pipe);
+            case '(':
+                return save_token(TKind::LParen);
+            case ')':
+                return save_token(TKind::RParen);
             case '=':
-                return save_token(TKind::Equals);
+                if(get_char() == '='){
+                    return save_token(TKind::EqualsEq);
+                }
+                unget_char();
+                return  save_token(TKind::Equals);
             case ';':
                 return save_token(TKind::Semicolon);
             default:
@@ -37,8 +81,9 @@ namespace wfac::lex {
                         c = get_char();
                         if(!std::isalnum(c)){
                             unget_char();
-                            std::string ident_str = "[TODO: implement stream read]";
+                            std::string ident_str = get_lexeme();
                             if(ident_str == "int"){
+                                
                                 return save_token(TKind::ReservedInt);
                             }
                             return save_token(TKind::Ident);
@@ -67,8 +112,19 @@ namespace wfac::lex {
     void Lexer::pin_token(){
         pinpos_ = curpos_;
     }
+    std::string Lexer::get_lexeme(Source::Location loc){
+        auto stream = source_->get_istream();
+        stream->seekg(loc.start);
+        std::string lexeme;
+        lexeme.resize(loc.end - loc.start);
+        stream->read(&lexeme[0], lexeme.size());
+        return lexeme;
+    }
+    std::string Lexer::get_lexeme(){
+        return get_lexeme(Source::Location{pinpos_, curpos_});
+    }
 
     Token Lexer::save_token(TKind kind){
-        return Token(kind, pinpos_ , curpos_);
+        return Token(kind, {pinpos_, curpos_});
     }
 }
