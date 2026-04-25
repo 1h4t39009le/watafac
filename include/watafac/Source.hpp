@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <optional>
+#include <istream>
 namespace wfac {
     class Source {
     public:

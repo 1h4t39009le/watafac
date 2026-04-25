@@ -13,10 +13,11 @@ namespace wfac::lex {
         int get_char();
         void unget_char();
         void pin_token();
-        Token save_token();
+        Token save_token(Token::Kind kind);
         
         std::shared_ptr<wfac::Source> source_;
-        char rdchar_ = '\0';
+        std::unique_ptr<std::istream> stream_;
+        int rdchar_ = EOF;
         std::size_t pinpos_ = 0, curpos_ = 0;
     };
 }

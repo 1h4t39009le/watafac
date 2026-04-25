@@ -33,4 +33,5 @@ macro(add_wfac_library name)
 endmacro()
 
 add_subdirectory(lib)
+add_subdirectory(lib/lex)
 add_subdirectory(tools/wfac)

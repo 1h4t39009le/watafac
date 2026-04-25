@@ -5,7 +5,7 @@ namespace wfac::lex {
     class Token {
     public:
         enum class Kind {
-            EOF,
+            Eof,
             Invalid,
             Plus,Star,Semicolon,Equals,
             //LITERALS
