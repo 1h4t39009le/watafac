@@ -1,18 +1,26 @@
-#include <iostream>
-#include <memory>
-#include <fstream>
-#include <watafac/Source.hpp>
-#include <watafac/lex/Lexer.hpp>
+#include <watafac/env/Session.hpp>
 #include <watafac/parse/Parser.hpp>
-int main(int argc, char **argv){
-    if(argc <= 1) return 1;
-    char *source = argv[1];
-    auto shrsrc = std::make_shared<wfac::FileSource>(source);
-    auto parser = wfac::parse::Parser(shrsrc);
-    auto *expr = parser.parse_expr();
-    
-    std::cout << "Hello, World! " << expr << "\n";
-    if(expr){
-        std::cout << expr->eval() << "\n";
+#include <watafac/ast/Expr.hpp>
+#include <iostream>
+
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        std::cerr << "Usage: wfac <file>\n";
+        return 1;
     }
+
+    wfac::env::Session session;
+    auto id = session.sources.add_source(
+        wfac::src::FileSource(argv[1])
+    );
+
+    wfac::parse::Parser parser(session, id);
+    auto expr = parser.parse_expr();
+
+    if (expr) {
+        std::cout << "Eval: " << expr->eval() << "\n";
+    }
+
+    session.diags.print_all(std::cerr, session.sources);
+    return session.diags.has_errors() ? 1 : 0;
 }

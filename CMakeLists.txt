@@ -32,8 +32,12 @@ macro(add_wfac_library name)
     add_library(wfac::${name} ALIAS ${name})
 endmacro()
 
-add_subdirectory(lib)
+
+add_subdirectory(lib/src)
+add_subdirectory(lib/diag)
+add_subdirectory(lib/env)
 add_subdirectory(lib/lex)
 add_subdirectory(lib/ast)
 add_subdirectory(lib/parse)
+
 add_subdirectory(tools/wfac)

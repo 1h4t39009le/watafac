@@ -1,9 +1,10 @@
 #ifndef WATAFAC_LEX_TOKEN_HPP
 #define WATAFAC_LEX_TOKEN_HPP
 #include <cstddef>
-#include <watafac/Source.hpp>
+#include <watafac/src/Source.hpp>
 namespace wfac::lex {
-    using wfac::Source;
+    namespace src = wfac::src;
+    
     class Token {
     public:
         enum class Kind {
@@ -55,13 +56,13 @@ namespace wfac::lex {
             }
             return "???";
         }
-        explicit Token(Kind kind, Source::Location loc);
+        explicit Token(Kind kind, src::SourceLocation loc);
         Token() = default;
         Kind get_kind() const;
-        Source::Location get_loc() const;
+        src::SourceLocation get_loc() const;
     private:
         Kind kind_ = Kind::Invalid;
-        Source::Location loc_;
+        src::SourceLocation loc_;
     };
 }
 #endif

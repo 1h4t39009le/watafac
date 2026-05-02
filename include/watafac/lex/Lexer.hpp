@@ -2,23 +2,26 @@
 #define WATAFAC_LEX_LEXER_HPP
 #include <cstddef>
 #include <memory>
-#include <watafac/Source.hpp>
+#include <watafac/env/Session.hpp>
 #include <watafac/lex/Token.hpp>
+
 namespace wfac::lex {
+    namespace src = wfac::src;
+    namespace diag = wfac::diag;
     class Lexer {
     public:
-        explicit Lexer(std::shared_ptr<wfac::Source> source);
+        explicit Lexer(env::Session &session, src::SourceId source_id);
         Token next_token();
-        std::string get_lexeme(Source::Location loc);
+        std::string get_lexeme(src::SourceLocation loc);
     private:
         int get_char();
         void unget_char();
         void pin_token();
         Token save_token(Token::Kind kind);
         std::string get_lexeme();
-        
-        
-        std::shared_ptr<wfac::Source> source_;
+
+        env::Session &session_;
+        src::SourceId source_id_;
         std::unique_ptr<std::istream> stream_;
         int rdchar_ = EOF;
         std::size_t pinpos_ = 0, curpos_ = 0;

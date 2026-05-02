@@ -1,10 +1,11 @@
 #include <watafac/parse/Parser.hpp>
 #include <utility>
 #include <charconv>
+using namespace std::string_literals;
 namespace wfac::parse {
-    Parser::Parser(std::shared_ptr<wfac::Source> source)
-        : lexer_(source),
-          source_{std::move(source)}
+    Parser::Parser(env::Session &session, src::SourceId source_id)
+        : session_(session), source_id_(source_id),
+          lexer_(session, source_id)
     {
         next_token();
     }
@@ -35,7 +36,10 @@ namespace wfac::parse {
         if(!left) return nullptr;
         if(match_kind(TKind::Equals)){
             right = parse_expr();
-            if(!right) return nullptr;
+            if(!right){
+                session_.error(source_id_, rdtoken_.get_loc(), "expected expression after '='");
+                return nullptr;
+            }
             auto *assign = alloc<ast::AssignExpr>(left, right);
             return assign;
         }
@@ -53,7 +57,10 @@ namespace wfac::parse {
             } else break;
         
             ast::Expr *right = parse_comparison();
-            if(!right) return nullptr;
+            if(!right){
+                session_.error(source_id_, rdtoken_.get_loc(), "expected expression after binary operator");
+                return nullptr;
+            }
 
             left = alloc<ast::BinopExpr>(left, kind, right);
         }
@@ -75,7 +82,10 @@ namespace wfac::parse {
             } else break;
         
             ast::Expr *right = parse_term();
-            if(!right) return nullptr;
+            if(!right){
+                session_.error(source_id_, rdtoken_.get_loc(), "expected expression after binary operator");
+                return nullptr;
+            }
 
             left = alloc<ast::BinopExpr>(left, kind, right);
         }
@@ -93,7 +103,10 @@ namespace wfac::parse {
             } else break;
         
             ast::Expr *right = parse_factor();
-            if(!right) return nullptr;
+            if(!right){
+                session_.error(source_id_, rdtoken_.get_loc(), "expected expression after binary operator");
+                return nullptr;
+            }
 
             left = alloc<ast::BinopExpr>(left, kind, right);
         }
@@ -113,7 +126,10 @@ namespace wfac::parse {
             } else break;
         
             ast::Expr *right = parse_unary();
-            if(!right) return nullptr;
+            if(!right){
+                session_.error(source_id_, rdtoken_.get_loc(), "expected expression after binary operator");
+                return nullptr;
+            }
 
             left = alloc<ast::BinopExpr>(left, kind, right);
         }
@@ -131,6 +147,9 @@ namespace wfac::parse {
             kind = ast::UnaryExpr::Kind::Deref;
         } else return parse_primary();
         ast::Expr *inner = parse_unary();
+        if(!inner){
+            session_.error(source_id_, rdtoken_.get_loc(), "expected expression after unary operator");
+        }
         return alloc<ast::UnaryExpr>(inner, kind);
     }
     ast::Expr *Parser::parse_primary(){
@@ -148,10 +167,12 @@ namespace wfac::parse {
         if(match_kind(TKind::LParen)){
             ast::Expr *expr = parse_expr();
             if(!match_kind(TKind::RParen)){
+                session_.error(source_id_, rdtoken_.get_loc(), "expected ')'");
                 return nullptr;
             }
             return expr;
         }
+        session_.error(source_id_, rdtoken_.get_loc(), "expected expression, got '"s + lex::Token::kind_name(rdtoken_.get_kind()) + "'");
         return nullptr;
     }
 }

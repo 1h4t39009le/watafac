@@ -2,9 +2,12 @@
 #include <cctype>
 namespace wfac::lex {
     using TKind = Token::Kind;
-    Lexer::Lexer(std::shared_ptr<wfac::Source> source)
-        : source_{std::move(source)}, stream_{source_->get_istream()}
-    {}
+    Lexer::Lexer(env::Session& session, src::SourceId source_id)
+        : session_(session), source_id_{source_id}
+    {
+        if(auto src = session.sources.get_source(source_id_))
+            stream_ = src->get_istream();
+    }
     Token Lexer::next_token(){
         for(;;){
             pin_token();
@@ -91,6 +94,9 @@ namespace wfac::lex {
                     }
                     
                 }
+                auto invalid = save_token(TKind::Invalid);
+                session_.error(source_id_, invalid.get_loc(), "unexpected character: '" + std::string(1, c) + "'");
+                return invalid;
             }
         }
     }
@@ -112,16 +118,22 @@ namespace wfac::lex {
     void Lexer::pin_token(){
         pinpos_ = curpos_;
     }
-    std::string Lexer::get_lexeme(Source::Location loc){
+    std::string Lexer::get_lexeme(src::SourceLocation loc){
+        auto src = session_.sources.get_source(source_id_);
+        if(!src) return "Unknown source"; //TODO: refactor
+        std::string_view content = src->get_content();
+        return std::string(content.substr(loc.start, loc.end-loc.start));
+        /*
         auto stream = source_->get_istream();
         stream->seekg(loc.start);
         std::string lexeme;
         lexeme.resize(loc.end - loc.start);
         stream->read(&lexeme[0], lexeme.size());
         return lexeme;
+        */
     }
     std::string Lexer::get_lexeme(){
-        return get_lexeme(Source::Location{pinpos_, curpos_});
+        return get_lexeme(src::SourceLocation{pinpos_, curpos_});
     }
 
     Token Lexer::save_token(TKind kind){

@@ -1,6 +1,6 @@
 #ifndef WATAFAC_PARSE_PARSER_HPP
 #define WATAFAC_PARSE_PARSER_HPP
-#include <watafac/Source.hpp>
+#include <watafac/env/Session.hpp>
 #include <watafac/lex/Lexer.hpp>
 #include <watafac/ast/Expr.hpp>
 #include <memory_resource>
@@ -9,10 +9,12 @@
 namespace wfac::parse {
     namespace lex = wfac::lex;
     namespace ast = wfac::ast;
+    namespace env = wfac::env;
+    namespace src = wfac::src;
     using TKind = lex::Token::Kind;
     class Parser {
     public:
-        explicit Parser(std::shared_ptr<wfac::Source> source);
+        explicit Parser(env::Session &session, src::SourceId source_id);
         ast::Expr *parse_expr(); // REMOVE FROM HERE
         std::optional<ast::ProgramGroup> parse();
         ~Parser();
@@ -48,9 +50,10 @@ namespace wfac::parse {
         ast::Expr *parse_primary();
 
         
-        
-        lex::Lexer lexer_;
-        std::shared_ptr<wfac::Source> source_;
+
+        env::Session &session_;
+        src::SourceId source_id_;
+        lex::Lexer lexer_;;
         lex::Token rdtoken_;
         std::pmr::monotonic_buffer_resource arena_;
         std::vector<std::function<void()>> cleanup_;
