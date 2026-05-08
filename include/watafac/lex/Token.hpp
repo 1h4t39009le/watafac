@@ -15,12 +15,21 @@ namespace wfac::lex {
             Equals, EqualsEq, NotEquals, Less, Greater, LessOrEq, GreaterOrEq,
             Bang, Ampersand, AmpersandAmp, Pipe, PipePip,
             Semicolon,
-            LParen, RParen, Comma,
+            LParen, RParen,
+            LBrace, RBrace,
+            Comma,
             
             //LITERALS
             Int,
             //KEYWORDS
-            ReservedInt,
+            KwInt,
+            KwIf,
+            KwElse,
+            KwWhile,
+            KwFor,
+            KwReturn,
+            
+            
 
             //OTHERS
             Ident
@@ -51,7 +60,12 @@ namespace wfac::lex {
             case Kind::RParen:       return ")";
             case Kind::Comma:        return ",";
             case Kind::Int:          return "INT";
-            case Kind::ReservedInt:  return "int";
+            case Kind::KwInt:        return "int";
+            case Kind::KwIf:         return "if";
+            case Kind::KwElse:       return "else";
+            case Kind::KwWhile:      return "while";
+            case Kind::KwFor:        return "for";
+            case Kind::KwReturn:     return "return";
             case Kind::Ident:        return "IDENT";
             }
             return "???";

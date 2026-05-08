@@ -5,13 +5,12 @@
 namespace wfac::ast {
     class Expr: public ArcheNode {
     public:
-        virtual int eval() = 0;
         virtual ~Expr() = default;
     };
     class IntExpr: public NodeLink<Expr, IntExpr> {
     public:
-        virtual int eval() override;
         explicit IntExpr(int value);
+        int value() const;
     private:
         int value_;
     };
@@ -32,16 +31,19 @@ namespace wfac::ast {
             LogicAnd,
             LogicOr
         };
-        virtual int eval() override;
+        static const char *kind_name(Kind kind);
         explicit BinopExpr(Expr *left, Kind kind, Expr *right);
+        const Expr *left() const;
+        const Expr *right() const;
+        Kind kind() const;
     private:
         Expr *left_, *right_;
         Kind kind_;
     };
     class VarExpr: public NodeLink<Expr, VarExpr>{
     public:
-        virtual int eval() override;
         explicit VarExpr(std::string ident);
+        const std::string &ident() const;
     private:
         std::string ident_;
     };
@@ -53,16 +55,19 @@ namespace wfac::ast {
             AddrOf,
             Deref
         };
-        virtual int eval() override;
+        static const char *kind_name(Kind kind);
         explicit UnaryExpr(Expr *inner, Kind kind);
+        const Expr *inner() const;
+        Kind kind() const;
     private:
         Expr *inner_;
         Kind kind_;
     };
     class AssignExpr: public NodeLink<Expr, AssignExpr>{
     public:
-        virtual int eval() override;
         explicit AssignExpr(Expr *left, Expr *right);
+        const Expr *left() const;
+        const Expr *right() const;
     private:
         Expr *left_, *right_;
     };

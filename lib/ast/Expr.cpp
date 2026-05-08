@@ -3,55 +3,55 @@ namespace wfac::ast {
     IntExpr::IntExpr(int value)
         : value_(value)
     {}
-    int IntExpr::eval() {
-        return value_;
-    }
+    int IntExpr::value() const{ return value_; }
 
     BinopExpr::BinopExpr(Expr *left, BinopExpr::Kind kind, Expr *right)
         : left_(left), kind_(kind), right_(right)
     {}
-    int BinopExpr::eval() {
-        switch(kind_){
-        case BinopExpr::Kind::Add: return left_->eval() + right_->eval();
-        case BinopExpr::Kind::Sub: return left_->eval() - right_->eval();
-        case BinopExpr::Kind::Mul: return left_->eval() * right_->eval();
-        case BinopExpr::Kind::Div: return left_->eval() / right_->eval();
-        case BinopExpr::Kind::Mod: return left_->eval() % right_->eval();
-        case BinopExpr::Kind::Equals:      return left_->eval() == right_->eval();
-        case BinopExpr::Kind::NotEquals:   return left_->eval() != right_->eval();
-        case BinopExpr::Kind::Less:        return left_->eval() < right_->eval();
-        case BinopExpr::Kind::Greater:     return left_->eval() > right_->eval();
-        case BinopExpr::Kind::LessOrEq:    return left_->eval() <= right_->eval();
-        case BinopExpr::Kind::GreaterOrEq: return left_->eval() >= right_->eval();
-        case BinopExpr::Kind::LogicAnd:    return left_->eval() && right_->eval();
-        case BinopExpr::Kind::LogicOr:     return left_->eval() || right_->eval();
+    const char *BinopExpr::kind_name(BinopExpr::Kind kind) {
+        switch (kind) {
+        case BinopExpr::Kind::Add:         return "+";
+        case BinopExpr::Kind::Sub:         return "-";
+        case BinopExpr::Kind::Mul:         return "*";
+        case BinopExpr::Kind::Div:         return "/";
+        case BinopExpr::Kind::Mod:         return "%";
+        case BinopExpr::Kind::Equals:      return "==";
+        case BinopExpr::Kind::NotEquals:   return "!=";
+        case BinopExpr::Kind::Less:        return "<";
+        case BinopExpr::Kind::Greater:     return ">";
+        case BinopExpr::Kind::LessOrEq:    return "<=";
+        case BinopExpr::Kind::GreaterOrEq: return ">=";
+        case BinopExpr::Kind::LogicAnd:    return "&&";
+        case BinopExpr::Kind::LogicOr:     return "||";
+        default: return "???";
         }
     }
+    const Expr *BinopExpr::left() const { return left_; }
+    const Expr *BinopExpr::right() const { return right_; }
+    BinopExpr::Kind BinopExpr::kind() const { return kind_; }
+    
     VarExpr::VarExpr(std::string ident)
         : ident_{std::move(ident)} {}
-    int VarExpr::eval() {
-        return ident_.length();
-    }
-
+    const std::string &VarExpr::ident() const { return ident_; }
+    
     UnaryExpr::UnaryExpr(Expr *inner, UnaryExpr::Kind kind)
         : inner_(inner), kind_(kind)
     {}
-    int UnaryExpr::eval() {
-        switch(kind_){
-        case UnaryExpr::Kind::Not:
-            return !(inner_->eval());
-        case UnaryExpr::Kind::Negative:
-            return -(inner_->eval());
-        default:
-            return 0;
+    const char *UnaryExpr::kind_name(UnaryExpr::Kind kind) {
+        switch (kind) {
+        case UnaryExpr::Kind::Not:      return "!";
+        case UnaryExpr::Kind::Negative: return "-";
+        case UnaryExpr::Kind::AddrOf:   return "&";
+        case UnaryExpr::Kind::Deref:    return "*";
+        default: return "???";
         }
     }
-    
+    const Expr *UnaryExpr::inner() const { return inner_; }
+    UnaryExpr::Kind UnaryExpr::kind() const { return kind_; }
     
     AssignExpr::AssignExpr(Expr *left, Expr *right)
         : left_(left), right_(right)
     {}
-    int AssignExpr::eval() {
-        return 0;
-    }
+    const Expr *AssignExpr::left() const { return left_; }
+    const Expr *AssignExpr::right() const { return right_; }
 }

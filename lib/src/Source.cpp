@@ -46,7 +46,7 @@ namespace wfac::src {
     std::string_view CachedSource::get_line(std::size_t line) const {
         if(line == 0 || line > line_offsets_.size()) return {};
         std::size_t start = line_offsets_[line-1],
-            end = ((line+1) < line_offsets_.size()) ? line_offsets_[line] - 1 : content_.size();
+            end = (line < line_offsets_.size()) ? line_offsets_[line] - 1 : content_.size();
         return get_content().substr(start, end - start);
         
     }

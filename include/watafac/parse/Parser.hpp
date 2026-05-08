@@ -2,7 +2,7 @@
 #define WATAFAC_PARSE_PARSER_HPP
 #include <watafac/env/Session.hpp>
 #include <watafac/lex/Lexer.hpp>
-#include <watafac/ast/Expr.hpp>
+#include <watafac/ast/Ast.hpp>
 #include <memory_resource>
 #include <optional>
 #include <functional>
@@ -16,6 +16,7 @@ namespace wfac::parse {
     public:
         explicit Parser(env::Session &session, src::SourceId source_id);
         ast::Expr *parse_expr(); // REMOVE FROM HERE
+        ast::Stmt *parse_stmt(); //REMOVE FROM HERE PLS :(
         std::optional<ast::ProgramGroup> parse();
         ~Parser();
     private:
@@ -39,7 +40,23 @@ namespace wfac::parse {
         */
         lex::Token next_token();
         bool match_kind(TKind kind, bool eat = true);
-        
+        template<typename T>
+        T *error_here(std::string msg){
+             session_.error(source_id_, rdtoken_.get_loc(), std::move(msg));
+             return nullptr;
+        }
+        template<typename T>
+        T *error_here_expected(TKind exp){
+            return error_here<T>(std::string("expected '") + lex::Token::kind_name(exp) + "' got '" + lex::Token::kind_name(rdtoken_.get_kind()) + "'");
+        }
+
+        ast::Stmt *parse_block_item();
+        ast::Stmt *parse_expr_stmt();
+        ast::Stmt *parse_compound_stmt();
+        ast::Stmt *parse_if_stmt();
+        ast::Stmt *parse_while_stmt();
+        ast::Stmt *parse_for_stmt();
+        ast::Stmt *parse_return_stmt();
         
         ast::Expr *parse_assignment();
         ast::Expr *parse_equality();

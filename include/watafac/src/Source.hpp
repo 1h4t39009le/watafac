@@ -39,6 +39,7 @@ namespace wfac::src{
                 it = std::find(it, view.end(), '\n');
                 if(it != view.end()) ++it;
             }
+            line_offsets_.push_back(content_.size());
         }
         std::unique_ptr<std::istream> get_istream() override;
         std::string get_name()const override;

@@ -59,6 +59,10 @@ namespace wfac::lex {
                 return save_token(TKind::LParen);
             case ')':
                 return save_token(TKind::RParen);
+            case '{':
+                return save_token(TKind::LBrace);
+            case '}':
+                return save_token(TKind::RBrace);
             case '=':
                 if(get_char() == '='){
                     return save_token(TKind::EqualsEq);
@@ -86,8 +90,17 @@ namespace wfac::lex {
                             unget_char();
                             std::string ident_str = get_lexeme();
                             if(ident_str == "int"){
-                                
-                                return save_token(TKind::ReservedInt);
+                                return save_token(TKind::KwInt);
+                            }else if(ident_str == "if"){
+                                return save_token(TKind::KwIf);
+                            }else if(ident_str == "else"){
+                                return save_token(TKind::KwElse);
+                            }else if(ident_str == "while"){
+                                return save_token(TKind::KwWhile);
+                            }else if(ident_str == "for"){
+                                return save_token(TKind::KwFor);
+                            }else if(ident_str == "return"){
+                                return save_token(TKind::KwReturn);
                             }
                             return save_token(TKind::Ident);
                         }
