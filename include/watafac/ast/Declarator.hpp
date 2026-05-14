@@ -6,24 +6,24 @@
 namespace wfac::ast {
     class Declarator: public ArcheNode {
     public:
-        virtual const std::string& get_name() const = 0;
+        virtual const std::string& name() const = 0;
         virtual ~Declarator() = default;
     };
     class TermDeclarator : public NodeLink<Declarator, TermDeclarator> {
     public:
-        const std::string& get_name() const override;
+        const std::string& name() const override;
         explicit TermDeclarator(std::string name);
     private:
         std::string name_;
     };
     class PointerDeclarator : public NodeLink<Declarator, PointerDeclarator>{
     public:
-        const std::string& get_name() const override;
-        explicit PointerDeclarator(const Declarator &inner, std::size_t power=1);
-        const Declarator &get_inner();
-        std::size_t get_power();
+        const std::string& name() const override;
+        explicit PointerDeclarator(const Declarator *inner, std::size_t power=1);
+        const Declarator *inner() const;
+        std::size_t power() const;
     private:
-        const Declarator &inner_;
+        const Declarator *inner_;
         std::size_t power_;
     };
 }

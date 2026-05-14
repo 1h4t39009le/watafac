@@ -20,6 +20,10 @@ namespace wfac::parse {
         std::optional<ast::ProgramGroup> parse();
         ~Parser();
     private:
+        struct ParsePoint{
+            lex::Lexer::Snapshot lex_snap;
+            lex::Token rdtoken;
+        };
         template<typename T, typename... Args>
         T *alloc(Args&&... args){
             void *ptr = arena_.allocate(sizeof(T), alignof(T));
@@ -33,9 +37,8 @@ namespace wfac::parse {
         /*
         ast::Expr *parse_prim();
         ast::Expr *parse_addition();
-        ast::Declarator *parse_declarator();
-        ast::PrimitiveTypeSpec *parse_type_spec();
-        ast::VarDecl *parse_var_decl();
+        
+        
         bool parse_program(ast::ProgramGroup &program);
         */
         lex::Token next_token();
@@ -50,7 +53,14 @@ namespace wfac::parse {
             return error_here<T>(std::string("expected '") + lex::Token::kind_name(exp) + "' got '" + lex::Token::kind_name(rdtoken_.get_kind()) + "'");
         }
 
-        ast::Stmt *parse_block_item();
+        ParsePoint save_point();
+        void restore_point(ParsePoint point);
+        
+        ast::Declarator *parse_declarator();
+        ast::PrimitiveTypeSpec *parse_type_spec();
+        ast::VarDecl *try_parse_var_decl();
+        
+        std::optional<ast::BlockItem> parse_block_item();
         ast::Stmt *parse_expr_stmt();
         ast::Stmt *parse_compound_stmt();
         ast::Stmt *parse_if_stmt();
@@ -65,7 +75,7 @@ namespace wfac::parse {
         ast::Expr *parse_factor();
         ast::Expr *parse_unary();
         ast::Expr *parse_primary();
-
+        
         
 
         env::Session &session_;

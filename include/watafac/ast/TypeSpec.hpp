@@ -8,7 +8,7 @@ namespace wfac::ast {
             Int, Char
         };
         explicit PrimitiveTypeSpec(Kind kind);
-        Kind get_kind() const;
+        Kind kind() const;
     private:
         Kind kind_;
     };

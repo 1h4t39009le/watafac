@@ -10,9 +10,18 @@ namespace wfac::lex {
     namespace diag = wfac::diag;
     class Lexer {
     public:
+        struct Snapshot{
+            std::streampos stream_pos;
+            std::size_t pinpos, curpos;
+            int rdchar;
+        };
         explicit Lexer(env::Session &session, src::SourceId source_id);
         Token next_token();
         std::string get_lexeme(src::SourceLocation loc);
+
+        Snapshot save();
+        void restore(Snapshot snap);
+        
     private:
         int get_char();
         void unget_char();

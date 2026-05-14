@@ -152,4 +152,19 @@ namespace wfac::lex {
     Token Lexer::save_token(TKind kind){
         return Token(kind, {pinpos_, curpos_});
     }
+
+    Lexer::Snapshot Lexer::save(){
+        return {
+            stream_->tellg(),
+            pinpos_, curpos_,
+            rdchar_
+        };
+    }
+    void Lexer::restore(Lexer::Snapshot snap){
+        stream_->clear();
+        stream_->seekg(snap.stream_pos);
+        pinpos_ = snap.pinpos;
+        curpos_ = snap.curpos;
+        rdchar_ = snap.rdchar;
+    }
 }

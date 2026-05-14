@@ -7,10 +7,13 @@
 namespace wfac::ast {   
     class VarDecl : public NodeLink<ArcheNode, VarDecl>{
     public:
-        explicit VarDecl(const PrimitiveTypeSpec &tspec,const Declarator &declarator,const Expr *init = nullptr);
+        explicit VarDecl(const PrimitiveTypeSpec *tspec,const Declarator *declarator,const Expr *init = nullptr);
+        const PrimitiveTypeSpec *type_spec() const;
+        const Declarator *declarator() const;
+        const Expr *init() const;
     private:
-        const PrimitiveTypeSpec &tspec_;
-        const Declarator &declarator_;
+        const PrimitiveTypeSpec *tspec_;
+        const Declarator *declarator_;
         const Expr *init_ = nullptr;
     };
 }

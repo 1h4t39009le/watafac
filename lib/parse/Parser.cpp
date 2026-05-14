@@ -27,7 +27,56 @@ namespace wfac::parse {
         }
         return false;
     }
-    
+
+    Parser::ParsePoint Parser::save_point(){
+        return {lexer_.save(),rdtoken_};
+    }
+    void Parser::restore_point(ParsePoint point){
+        lexer_.restore(std::move(point.lex_snap));
+        rdtoken_ = std::move(point.rdtoken);
+    }
+    ast::Declarator *Parser::parse_declarator(){
+        if(match_kind(TKind::Star)){
+            int power = 1;
+            while(match_kind(TKind::Star)) power++;
+            ast::Declarator *inner = parse_declarator();
+            return alloc<ast::PointerDeclarator>(inner, power);
+        }
+        std::string name = lexer_.get_lexeme(rdtoken_.get_loc());
+        if(!match_kind(TKind::Ident)){
+            return error_here_expected<ast::Declarator>(TKind::Ident);
+        }
+        return alloc<ast::TermDeclarator>(std::move(name));
+    }
+    ast::PrimitiveTypeSpec *Parser::parse_type_spec(){
+        if(match_kind(TKind::KwInt)){
+            return alloc<ast::PrimitiveTypeSpec>(ast::PrimitiveTypeSpec::Kind::Int);
+        }
+        return nullptr;
+    }
+    ast::VarDecl *Parser::try_parse_var_decl(){
+        auto pt = save_point();
+        ast::PrimitiveTypeSpec *ts = parse_type_spec();
+        auto recover_path = [&](ast::VarDecl *err) -> ast::VarDecl* {restore_point(std::move(pt)); return err;};
+        if(!ts){
+            return recover_path(nullptr); //bc ambigious if didn't find int, char, ... then can be expr
+        }
+        ast::Declarator *d = parse_declarator();
+        if(!d){
+            return error_here<ast::VarDecl>("expected <declarator>");// not ambigious if we found int then its 100% decl
+        }
+        ast::Expr *expr{};
+        if(match_kind(TKind::Equals)){
+            expr = parse_expr();
+            if(!expr){
+                return error_here<ast::VarDecl>("expected <expr> after '='");
+            }
+        }
+        if(!match_kind(TKind::Semicolon)){
+            return error_here_expected<ast::VarDecl>(TKind::Semicolon);
+        }
+        return alloc<ast::VarDecl>(ts, d, expr);
+    }
     ast::Expr *Parser::parse_expr(){
         return parse_assignment();
     }
@@ -48,8 +97,14 @@ namespace wfac::parse {
         }
     }
 
-    ast::Stmt *Parser::parse_block_item(){
-        return parse_stmt();
+    std::optional<ast::BlockItem> Parser::parse_block_item(){
+        if(auto *var_decl = try_parse_var_decl()){
+            return var_decl;
+        }
+        if(auto *stmt = parse_stmt()){
+            return stmt;
+        }
+        return std::nullopt;
     }
     ast::Stmt *Parser::parse_expr_stmt(){
         ast::Expr *expr = parse_expr();
@@ -64,8 +119,8 @@ namespace wfac::parse {
             if(match_kind(TKind::Eof)){
                 return error_here_expected<ast::Stmt>(TKind::RBrace);
             }
-            if(ast::Stmt *stmt = parse_stmt()){
-                compound_stmt->add_item(stmt);
+            if(auto item = parse_block_item()){
+                compound_stmt->add_item(std::move(*item));
             }
         }
         return compound_stmt;

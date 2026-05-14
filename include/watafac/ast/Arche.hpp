@@ -22,14 +22,14 @@ namespace wfac::ast {
     class ProgramGroup; //TODO
 
     //DECLARATORS
-    class TermDeclarator; //TODO
-    class PointerDeclarator; //TODO
+    class TermDeclarator;
+    class PointerDeclarator;
 
     //DECLARATIONS
-    class VarDecl; //TODO
+    class VarDecl;
 
     //TYPE SPECIFIERS
-    class PrimitiveTypeSpec; //TODO
+    class PrimitiveTypeSpec;
     
     class Visitor {
     public:
@@ -49,14 +49,14 @@ namespace wfac::ast {
         virtual void visit(const ForStmt &s) = 0;
         virtual void visit(const ReturnStmt &s) = 0;
         
-        /*virtual void visit(ProgramGroup &prg) = 0;
+        //virtual void visit(ProgramGroup &prg) = 0;
         
-        virtual void visit(TermDeclarator    &td) = 0;
-        virtual void visit(PointerDeclarator &ptrd) = 0;
+        virtual void visit(const TermDeclarator    &d) = 0;
+        virtual void visit(const PointerDeclarator &d) = 0;
 
-        virtual void visit(VarDecl &vardecl) = 0;
+        virtual void visit(const VarDecl &vardecl) = 0;
         
-        virtual void visit(PrimitiveTypeSpec &tspec) = 0;*/
+        virtual void visit(const PrimitiveTypeSpec &ts) = 0;
     };
     class ArcheNode {
     public:

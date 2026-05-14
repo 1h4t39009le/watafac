@@ -3,6 +3,7 @@
 #include <watafac/ast/Arche.hpp>
 #include <watafac/ast/Expr.hpp>
 #include <vector>
+#include <variant>
 
 namespace wfac::ast {
     class Stmt : public ArcheNode {
@@ -18,7 +19,7 @@ namespace wfac::ast {
         Expr *expr_;
     };
 
-    using BlockItem = Stmt*;
+    using BlockItem = std::variant<Stmt*, VarDecl*>;
     class CompoundStmt: public NodeLink<Stmt, CompoundStmt>{
     public:
         using Items = std::vector<BlockItem>;
