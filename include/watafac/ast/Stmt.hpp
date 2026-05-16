@@ -2,6 +2,7 @@
 #define WATAFAC_AST_STMT_HPP
 #include <watafac/ast/Arche.hpp>
 #include <watafac/ast/Expr.hpp>
+#include <watafac/ast/Decl.hpp>
 #include <vector>
 #include <variant>
 
@@ -19,7 +20,7 @@ namespace wfac::ast {
         Expr *expr_;
     };
 
-    using BlockItem = std::variant<Stmt*, VarDecl*>;
+    using BlockItem = std::variant<Stmt*, Decl*>;
     class CompoundStmt: public NodeLink<Stmt, CompoundStmt>{
     public:
         using Items = std::vector<BlockItem>;
@@ -72,6 +73,16 @@ namespace wfac::ast {
         const Expr *expr() const;
     private:
         Expr *expr_;
+    };
+    
+    class ExternCallStmt : public NodeLink<Stmt, ExternCallStmt> {
+    public:
+        explicit ExternCallStmt(std::string name, std::vector<Expr*> args);
+        const std::string &name() const;
+        const std::vector<Expr*> &args() const;
+    private:
+        std::string name_;
+        std::vector<Expr*> args_;
     };
 }
 #endif

@@ -5,6 +5,16 @@
 
 class PrintVisitor: public wfac::ast::Visitor {
 public:
+    void visit(const wfac::ast::Program &p) override {
+        print_indent() << "PROGRAM\n";
+        enter_block();
+        for (const auto &item : p) {
+            std::visit([this](auto *node){
+                if(node) node->accept(*this);
+            }, item);
+        }
+        leave_block();
+    }
     void visit(const wfac::ast::IntExpr &e) override{
         print_indent() << "INT: " << e.value() << '\n';
     }
@@ -32,6 +42,15 @@ public:
             e.left()->accept(*this);
             e.right()->accept(*this);
         } leave_block();
+    }
+    void visit(const wfac::ast::CharExpr &e) override {
+        char c = e.value();
+        if (c == '\n') print_indent() << "CHAR: '\\n'\n";
+        else if (c == '\t') print_indent() << "CHAR: '\\t'\n";
+        else print_indent() << "CHAR: '" << c << "'\n";
+    }
+    void visit(const wfac::ast::StringExpr &e) override {
+        print_indent() << "STRING: id=" << e.string_id() << "\n";
     }
     void visit(const wfac::ast::ExprStmt &s) override {
         print_indent() << "EXPR_STMT\n";
@@ -102,27 +121,35 @@ public:
         if (s.expr()) s.expr()->accept(*this);
         leave_block();
     }
-    void visit(const wfac::ast::TermDeclarator    &d) override {
-        print_indent() << "NAME(" << d.name() << ")\n";
-    }
-    void visit(const wfac::ast::PointerDeclarator &d) override{
-        print_indent() << std::string('*', d.power()) << '\n';
-    }
-
-    void visit(const wfac::ast::VarDecl &vardecl) override {
-        print_indent() << "VAR_DECL\n";
+    void visit(const wfac::ast::ExternCallStmt &s) override {
+        print_indent() << "EXTERN_CALL: " << s.name() << "\n";
         enter_block();
-        vardecl.type_spec()->accept(*this);
-        vardecl.declarator()->accept(*this);
-        if(vardecl.init()){
-            print_indent() << "EQUALS\n";
-            vardecl.init()->accept(*this);
+        for (auto *arg : s.args()) {
+            arg->accept(*this);
         }
         leave_block();
     }
-        
-    void visit(const wfac::ast::PrimitiveTypeSpec &ts) override {
-        print_indent() << "<TODO: INT>" << '\n';
+    void visit(const wfac::ast::VarDecl &d) override {
+        print_indent() << "VAR_DECL " << d.name() << "\n";
+        enter_block();
+        d.type()->accept(*this);
+        if(d.init()){
+            print_indent() << "EQUALS\n";
+            d.init()->accept(*this);
+        }
+        leave_block();
+    }
+    void visit(const wfac::ast::ExternDecl &d) override {
+        print_indent() << "EXTERN " << d.name() << "\n";
+    }
+    void visit(const wfac::ast::TermType &t) override {
+        print_indent() << "TYPE: " << wfac::ast::TermType::kind_name(t.kind()) << "\n";
+    }
+    void visit(const wfac::ast::PointerType &t) override {
+        print_indent() << "PTR\n";
+        enter_block();
+        t.pointee()->accept(*this);
+        leave_block();
     }
 
 private:
@@ -146,13 +173,12 @@ int main(int argc, char **argv) {
     );
 
     wfac::parse::Parser parser(session, id);
-    wfac::ast::Stmt *stmt = parser.parse_stmt();
-
-    if (stmt) {
+    auto program = parser.parse();
+    if (program) {
         PrintVisitor printer;
-        stmt->accept(printer);
+        program->accept(printer);
     }
-
+                 
     session.diags.print_all(std::cerr, session.sources);
     return session.diags.has_errors() ? 1 : 0;
 }

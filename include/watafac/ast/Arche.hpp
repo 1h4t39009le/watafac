@@ -4,13 +4,17 @@ namespace wfac::ast {
 
     //EXPR
     class IntExpr;
+    class CharExpr;
+    class StringExpr;
     class BinopExpr;
 
     class VarExpr;
     class UnaryExpr;
     class AssignExpr;
 
+
     //STMT
+    class ExternCallStmt;
     class ExprStmt;
     class CompoundStmt;
     class IfStmt;
@@ -18,23 +22,25 @@ namespace wfac::ast {
     class ForStmt;
     class ReturnStmt;
 
-    //GROUPS
-    class ProgramGroup; //TODO
+    //PROGRAM
+    class Program;
 
-    //DECLARATORS
-    class TermDeclarator;
-    class PointerDeclarator;
+    //TYPES
+    class TermType;
+    class PointerType;
 
     //DECLARATIONS
+    class ExternDecl;
     class VarDecl;
-
-    //TYPE SPECIFIERS
-    class PrimitiveTypeSpec;
     
     class Visitor {
     public:
+        //PROGRAM
+        virtual void visit(const Program &p) = 0;
         //EXPR
         virtual void visit(const IntExpr &e) = 0;
+        virtual void visit(const CharExpr &e) = 0;
+        virtual void visit(const StringExpr &e) = 0;
         virtual void visit(const BinopExpr &e) = 0;
         
         virtual void visit(const VarExpr &e) = 0;
@@ -42,6 +48,7 @@ namespace wfac::ast {
         virtual void visit(const AssignExpr &e) = 0;
 
         //STMT
+        virtual void visit(const ExternCallStmt &s) = 0;
         virtual void visit(const ExprStmt &s) = 0;
         virtual void visit(const CompoundStmt &s) = 0;
         virtual void visit(const IfStmt &s) = 0;
@@ -49,14 +56,13 @@ namespace wfac::ast {
         virtual void visit(const ForStmt &s) = 0;
         virtual void visit(const ReturnStmt &s) = 0;
         
-        //virtual void visit(ProgramGroup &prg) = 0;
-        
-        virtual void visit(const TermDeclarator    &d) = 0;
-        virtual void visit(const PointerDeclarator &d) = 0;
+        //DECLARATIONS
+        virtual void visit(const VarDecl &d) = 0;
+        virtual void visit(const ExternDecl &d) = 0;
 
-        virtual void visit(const VarDecl &vardecl) = 0;
-        
-        virtual void visit(const PrimitiveTypeSpec &ts) = 0;
+        //TYPES
+        virtual void visit(const TermType &t) = 0;
+        virtual void visit(const PointerType &t) = 0;
     };
     class ArcheNode {
     public:

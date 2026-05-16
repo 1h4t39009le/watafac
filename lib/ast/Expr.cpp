@@ -5,6 +5,16 @@ namespace wfac::ast {
     {}
     int IntExpr::value() const{ return value_; }
 
+    CharExpr::CharExpr(char value)
+        : value_(value)
+    {}
+    char CharExpr::value() const { return value_; }
+
+    StringExpr::StringExpr(size_t string_id)
+        : string_id_(string_id)
+    {}
+    size_t StringExpr::string_id() const { return string_id_; }
+
     BinopExpr::BinopExpr(Expr *left, BinopExpr::Kind kind, Expr *right)
         : left_(left), kind_(kind), right_(right)
     {}

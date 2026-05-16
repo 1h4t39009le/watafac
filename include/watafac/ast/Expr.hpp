@@ -14,6 +14,21 @@ namespace wfac::ast {
     private:
         int value_;
     };
+    class CharExpr : public NodeLink<Expr, CharExpr> {
+    public:
+        explicit CharExpr(char value);
+        char value() const;
+    private:
+        char value_;
+    };
+    
+    class StringExpr : public NodeLink<Expr, StringExpr> {
+    public:
+        explicit StringExpr(size_t string_id);
+        size_t string_id() const;
+    private:
+        size_t string_id_;
+    };
     class BinopExpr: public NodeLink<Expr, BinopExpr> {
     public:
         enum class Kind {

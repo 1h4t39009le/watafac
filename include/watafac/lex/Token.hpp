@@ -20,9 +20,13 @@ namespace wfac::lex {
             Comma,
             
             //LITERALS
-            Int,
+            IntLit,
+            CharLit,
+            StringLit,
             //KEYWORDS
             KwInt,
+            KwChar,
+            KwExtrn,
             KwIf,
             KwElse,
             KwWhile,
@@ -58,9 +62,15 @@ namespace wfac::lex {
             case Kind::Semicolon:    return ";";
             case Kind::LParen:       return "(";
             case Kind::RParen:       return ")";
+            case Kind::LBrace:       return "{";
+            case Kind::RBrace:       return "}";
             case Kind::Comma:        return ",";
-            case Kind::Int:          return "INT";
+            case Kind::IntLit:       return "INT";
+            case Kind::CharLit:      return "CHAR";
+            case Kind::StringLit:    return "STRING";
+            case Kind::KwExtrn:      return "extrn";
             case Kind::KwInt:        return "int";
+            case Kind::KwChar:       return "char";
             case Kind::KwIf:         return "if";
             case Kind::KwElse:       return "else";
             case Kind::KwWhile:      return "while";

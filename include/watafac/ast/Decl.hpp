@@ -1,20 +1,34 @@
 #ifndef WATAFAC_AST_DECL_HPP
 #define WATAFAC_AST_DECL_HPP
 #include <watafac/ast/Arche.hpp>
-#include <watafac/ast/Declarator.hpp>
-#include <watafac/ast/TypeSpec.hpp>
+#include <watafac/ast/Type.hpp>
 #include <watafac/ast/Expr.hpp>
-namespace wfac::ast {   
-    class VarDecl : public NodeLink<ArcheNode, VarDecl>{
+#include <string>
+namespace wfac::ast {
+    
+    class Decl : public ArcheNode {
     public:
-        explicit VarDecl(const PrimitiveTypeSpec *tspec,const Declarator *declarator,const Expr *init = nullptr);
-        const PrimitiveTypeSpec *type_spec() const;
-        const Declarator *declarator() const;
+        virtual ~Decl() = default;
+    };
+    
+    class VarDecl : public NodeLink<Decl, VarDecl> {
+    public:
+        explicit VarDecl(const Type *type, std::string name, const Expr *init = nullptr);
+        const Type *type() const;
+        const std::string &name() const;
         const Expr *init() const;
     private:
-        const PrimitiveTypeSpec *tspec_;
-        const Declarator *declarator_;
+        const Type *type_;
+        std::string name_;
         const Expr *init_ = nullptr;
+    };
+    
+    class ExternDecl : public NodeLink<Decl, ExternDecl> {
+    public:
+        explicit ExternDecl(std::string name);
+        const std::string &name() const;
+    private:
+        std::string name_;
     };
 }
 #endif

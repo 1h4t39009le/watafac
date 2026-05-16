@@ -71,6 +71,31 @@ namespace wfac::lex {
                 return  save_token(TKind::Equals);
             case ';':
                 return save_token(TKind::Semicolon);
+            case ',':
+                return save_token(TKind::Comma);
+            case '\'':
+                {
+                    c = get_char();
+                    if (c == '\\') get_char();
+                    if (get_char() != '\'') {
+                        session_.error(source_id_, {pinpos_, curpos_}, "unterminated char literal");
+                    }
+                    return save_token(TKind::CharLit);
+                }
+
+            case '"':
+                {
+                    for (;;) {
+                        c = get_char();
+                        if (c == '"') break;
+                        if (c == EOF || c == '\n') {
+                            session_.error(source_id_, {pinpos_, curpos_}, "unterminated string literal");
+                            break;
+                        }
+                        if (c == '\\') get_char();
+                    }
+                    return save_token(TKind::StringLit);
+                }
             default:
                 if(std::isspace(c))
                     continue;
@@ -79,7 +104,7 @@ namespace wfac::lex {
                         c = get_char();
                         if(!std::isdigit(c)){
                             unget_char();
-                            return save_token(TKind::Int);
+                            return save_token(TKind::IntLit);
                         }
                     }
                 }
@@ -101,6 +126,10 @@ namespace wfac::lex {
                                 return save_token(TKind::KwFor);
                             }else if(ident_str == "return"){
                                 return save_token(TKind::KwReturn);
+                            }else if(ident_str == "char"){
+                                return save_token(TKind::KwChar);
+                            }else if(ident_str == "extrn"){
+                                return save_token(TKind::KwExtrn);
                             }
                             return save_token(TKind::Ident);
                         }
@@ -136,14 +165,6 @@ namespace wfac::lex {
         if(!src) return "Unknown source"; //TODO: refactor
         std::string_view content = src->get_content();
         return std::string(content.substr(loc.start, loc.end-loc.start));
-        /*
-        auto stream = source_->get_istream();
-        stream->seekg(loc.start);
-        std::string lexeme;
-        lexeme.resize(loc.end - loc.start);
-        stream->read(&lexeme[0], lexeme.size());
-        return lexeme;
-        */
     }
     std::string Lexer::get_lexeme(){
         return get_lexeme(src::SourceLocation{pinpos_, curpos_});
@@ -168,3 +189,4 @@ namespace wfac::lex {
         rdchar_ = snap.rdchar;
     }
 }
+ 

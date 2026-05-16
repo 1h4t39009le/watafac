@@ -42,4 +42,10 @@ namespace wfac::ast {
         : expr_(expr)
     {}
     const Expr *ReturnStmt::expr() const { return expr_; }
+
+    ExternCallStmt::ExternCallStmt(std::string name, std::vector<Expr*> args)
+        : name_(std::move(name)), args_(std::move(args))
+    {}
+    const std::string &ExternCallStmt::name() const { return name_; }
+    const std::vector<Expr*> &ExternCallStmt::args() const { return args_; }
 }
